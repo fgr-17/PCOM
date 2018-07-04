@@ -37,10 +37,11 @@
 
 /*==================[inclusions]=============================================*/
 
-#include "stdint.h"
 
-#include "rtc_lib.h"   // <= own header (optional)
+#include <stdint.h>
+#include <string.h>
 #include "sapi.h"    // <= sAPI header
+#include "rtc_lib.h"   // <= own header (optional)
 
 /*==================[macros and definitions]=================================*/
 
@@ -98,6 +99,7 @@ void showDateAndTime( rtc_t * rtc ){
    /* Envio el dia */
    if( (rtc->mday)<10 )
       uartWriteByte( UART_USB, '0' );
+
    uartWriteString( UART_USB, uartBuff );
    uartWriteByte( UART_USB, '/' );
 
@@ -150,6 +152,42 @@ void showDateAndTime( rtc_t * rtc ){
 }
 
 
+/**
+ * @fn paso fecha y hora a string
+ *
+ */
+
+#define FECHAHORA_L 32
+#define BUF_L	16
+int fechaHoraAString ( rtc_t *rtc, char* cadena, int n) {
+
+	char fechaHora [FECHAHORA_L];
+	char buf [BUF_L];
+
+
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->mday), (char*)buf, BUF_L ); /* 10 significa decimal */
+	strcpy(fechaHora, buf);
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->month), (char*)buf, 10 ); /* 10 significa decimal */
+	strcat(fechaHora, buf);
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->year), (char*)buf, 10 ); /* 10 significa decimal */
+	strcat(fechaHora, buf);
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->hour), (char*)buf, 10 ); /* 10 significa decimal */
+	strcat(fechaHora, buf);
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->min), (char*)buf, 10 ); /* 10 significa decimal */
+	strcat(fechaHora, buf);
+	/* Conversion de entero a ascii con base decimal */
+	itoa( (int) (rtc->sec), (char*)buf, 10 ); /* 10 significa decimal */
+	strcat(fechaHora, buf);
+	strcat(fechaHora, "\r\n");
+	return 0;
+}
+
+
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
 int inicializarRTC (void) {
 
@@ -159,12 +197,12 @@ int inicializarRTC (void) {
    /* Estructura RTC */
    rtc_t rtc;
 
-   rtc.year = 2016;
+   rtc.year = 2018;
    rtc.month = 7;
-   rtc.mday = 3;
+   rtc.mday = 4;
    rtc.wday = 1;
-   rtc.hour = 13;
-   rtc.min = 17;
+   rtc.hour = 18;
+   rtc.min = 26;
    rtc.sec= 0;
 
    bool_t val = 0;
@@ -178,36 +216,14 @@ int inicializarRTC (void) {
 
    delay(2000); // El RTC tarda en setear la hora, por eso el delay
 
-   for( i=0; i<10; i++ ){
-      /* Leer fecha y hora */
+
+   /*for( i=0; i<10; i++ ){
+       Leer fecha y hora
       val = rtcRead( &rtc );
-      /* Mostrar fecha y hora en formato "DD/MM/YYYY, HH:MM:SS" */
+       Mostrar fecha y hora en formato "DD/MM/YYYY, HH:MM:SS"
       showDateAndTime( &rtc );
       delay(1000);
-   }
-
-   rtc.year = 2016;
-   rtc.month = 7;
-   rtc.mday = 3;
-   rtc.wday = 1;
-   rtc.hour = 14;
-   rtc.min = 30;
-   rtc.sec= 0;
-
-   /* Establecer fecha y hora */
-   val = rtcWrite( &rtc );
-
-   /* ------------- REPETIR POR SIEMPRE ------------- */
-   while(1) {
-
-      if( delayRead( &delay1s ) ){
-         /* Leer fecha y hora */
-         val = rtcRead( &rtc );
-         /* Mostrar fecha y hora en formato "DD/MM/YYYY, HH:MM:SS" */
-         showDateAndTime( &rtc );
-      }
-
-   }
+   }*/
 
    /* NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa no es llamado
       por ningun S.O. */

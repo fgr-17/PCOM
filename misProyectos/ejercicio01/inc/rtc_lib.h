@@ -37,7 +37,6 @@
 #define _RTC_H_
 
 /*==================[inclusions]=============================================*/
-
 /*==================[cplusplus]==============================================*/
 
 #ifdef __cplusplus
@@ -51,7 +50,7 @@ extern "C" {
 /*==================[external data declaration]==============================*/
 
 /*==================[external functions declaration]=========================*/
-
+extern int fechaHoraAString ( rtc_t *rtc, char* cadena, int n);
 /*==================[cplusplus]==============================================*/
 
 #ifdef __cplusplus

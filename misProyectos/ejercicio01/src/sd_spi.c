@@ -35,12 +35,16 @@
 
 /*==================[inlcusiones]============================================*/
 
+#include <string.h>
+
 #include "../../ejercicio01/inc/sd_spi.h"   // <= own header (optional)
 
-#include "../inc/rtc_lib.h"
 #include "sapi.h"     // <= sAPI header
 
 #include "ff.h"       // <= Biblioteca FAT FS
+
+#include "../inc/rtc_lib.h"
+
 /*==================[definiciones y macros]==================================*/
 
 #define FILENAME "hola.txt"
@@ -65,6 +69,10 @@ void diskTickHook( void *ptr );
 // FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE ENCENDIDO O RESET.
 int main( void ){
 
+	char fechaHora [32];
+	bool_t val;
+   /* Estructura RTC */
+   rtc_t rtc;
    // ---------- CONFIGURACIONES ------------------------------
    // Inicializar y configurar la plataforma
    boardConfig();
@@ -78,15 +86,21 @@ int main( void ){
    tickCallbackSet( diskTickHook, NULL );
 
 
-
+   /* inicializo RTC */
    inicializarRTC();
 
    // ------ PROGRAMA QUE ESCRIBE EN LA SD -------
 
    UINT nbytes;
 
+   uartWriteString( UART_USB, "Ejercicio 01:\r\n" );
+   uartWriteString( UART_USB, "Inicializando SD..." );
+
+
    // Give a work area to the default drive
    if( f_mount( &fs, "", 0 ) != FR_OK ){
+	   uartWriteString( UART_USB, "no se pudo inicializar la SD, esta conectada?\r\n" );
+	   while(1);
       // If this fails, it means that the function could
       // not register a file system object.
       // Check whether the SD card is correctly connected
@@ -96,9 +110,16 @@ int main( void ){
 
    uint8_t i=0;
 
-   for( i=0; i<5; i++ ){
 
-      if( f_open( &fp, FILENAME, FA_WRITE | FA_OPEN_APPEND ) == FR_OK ){
+
+   if( f_open( &fp, FILENAME, FA_WRITE | FA_OPEN_APPEND ) == FR_OK ){
+
+	   for( i=0; i<5; i++ ) {
+
+
+    	  val = rtcRead( &rtc );
+    	  fechaHoraAString(&rtc, fechaHora, 32);
+    	  f_write( &fp, fechaHora, strlen(fechaHora), &nbytes );
          f_write( &fp, "Hola mundo\r\n", 12, &nbytes );
 
          f_close(&fp);
@@ -107,10 +128,13 @@ int main( void ){
             // Turn ON LEDG if the write operation was successful
             gpioWrite( LEDG, ON );
          }
-      } else{
-         // Turn ON LEDR if the write operation was fail
-         gpioWrite( LEDR, ON );
-      }
+	   }
+
+   }
+   else {
+		// Turn ON LEDR if the write operation was fail
+		uartWriteString( UART_USB, "No escribir la memoria SD, esta conectada?\r\n" );
+		gpioWrite( LEDR, ON );
    }
 
    // ---------- REPETIR POR SIEMPRE --------------------------
