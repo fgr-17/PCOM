@@ -5,10 +5,11 @@
 # ---------- Project path ----------------------------------------------
 # Project path 
 # (relative to this folder, leave void if the project is in this folder)
-PROJECT_PATH =
+# PROJECT_PATH = examples/sAPI/bare_metal
+PROJECT_PATH = misProyectos
 # ---------- Project names ---------------------------------------------
-PROJECT_NAME = app
-
+# PROJECT_NAME = rtc_01
+PROJECT_NAME = ejercicio01
 #==============================================================================
 # Examples
 # Notas: Los proyectos indentados compilan pero no se probo con el periferico
