@@ -51,6 +51,7 @@ extern "C" {
 
 /*==================[external functions declaration]=========================*/
 extern int fechaHoraAString ( rtc_t *rtc, char* cadena, int n);
+extern void rtcToString( char* str, rtc_t* rtc );
 /*==================[cplusplus]==============================================*/
 
 #ifdef __cplusplus

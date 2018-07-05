@@ -188,6 +188,71 @@ int fechaHoraAString ( rtc_t *rtc, char* cadena, int n) {
 }
 
 
+// Guarda en str la fecha y hora convertido a string en formato "DD/MM/YYYY HH:MM:SS"
+void rtcToString( char* rtcString, rtc_t* rtc ) {
+
+   char rtcMemberString[10];
+   rtcString[0] = 0;
+
+   // "DD/MM/YYYY "
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->mday), rtcMemberString, 10 );
+   if( (rtc->mday)<10 ){
+      // Concateno rtcString+"0"
+      strncat( rtcString, "0", strlen("0") );
+   }
+   // Concateno rtcString+mday+"/"
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+   strncat( rtcString, "/", strlen("/") );
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->month), rtcMemberString, 10 );
+   if( (rtc->month)<10 ){
+      // Concateno rtcString+"0"
+      strncat( rtcString, "0", strlen("0") );
+   }
+   // Concateno rtcString+month+"/"
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+   strncat( rtcString, "/", strlen("/") );
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->year), rtcMemberString, 10 );
+   // Concateno rtcString+year+" "
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+   strncat( rtcString, " ", strlen(" ") );
+
+   // "HH:MM:SS"
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->hour), rtcMemberString, 10 );
+   if( (rtc->hour)<10 ){
+      // Concateno rtcString+"0"
+      strncat( rtcString, "0", strlen("0") );
+   }
+   // Concateno rtcString+hour+":"
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+   strncat( rtcString, ":", strlen(":") );
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->min), rtcMemberString, 10 );
+   if( (rtc->min)<10 ){
+      // Concateno rtcString+"0"
+      strncat( rtcString, "0", strlen("0") );
+   }
+   // Concateno rtcString+min+":"
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+   strncat( rtcString, ":", strlen(":") );
+
+   // Conversion de entero a string con base 10 (decimal)
+   int64ToString( (rtc->sec), rtcMemberString, 10 );
+   if( (rtc->sec)<10 ){
+      // Concateno rtcString+"0"
+      strncat( rtcString, "0", strlen("0") );
+   }
+   // Concateno rtcString+sec
+   strncat( rtcString, rtcMemberString, strlen(rtcMemberString) );
+}
 /* FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE RESET. */
 int inicializarRTC (void) {
 
@@ -227,7 +292,7 @@ int inicializarRTC (void) {
 
    /* NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa no es llamado
       por ningun S.O. */
-   return 0 ;
+   return val ;
 }
 
 /*==================[end of file]============================================*/

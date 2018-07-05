@@ -86,20 +86,29 @@ int main( void ){
    tickCallbackSet( diskTickHook, NULL );
 
 
-   /* inicializo RTC */
-   inicializarRTC();
-
    // ------ PROGRAMA QUE ESCRIBE EN LA SD -------
 
    UINT nbytes;
 
    uartWriteString( UART_USB, "Ejercicio 01:\r\n" );
-   uartWriteString( UART_USB, "Inicializando SD..." );
 
+
+
+	/* inicializo RTC */
+	uartWriteString( UART_USB, "inicializando RTC..." );
+	if(inicializarRTC() != 1) {
+		uartWriteString( UART_USB, "error al inicializar RTC\r\n" );
+		while(1);
+	}
+	uartWriteString( UART_USB, "RTC inicializado\r\n" );
+
+
+
+   uartWriteString( UART_USB, "Inicializando SD..." );
 
    // Give a work area to the default drive
    if( f_mount( &fs, "", 0 ) != FR_OK ){
-	   uartWriteString( UART_USB, "no se pudo inicializar la SD, esta conectada?\r\n" );
+	   uartWriteString( UART_USB, "no se pudo montar la SD, esta conectada?\r\n" );
 	   while(1);
       // If this fails, it means that the function could
       // not register a file system object.
@@ -116,24 +125,32 @@ int main( void ){
 
 	   for( i=0; i<5; i++ ) {
 
+	   delay(500);
+		val = rtcRead( &rtc );
+		rtcToString(fechaHora, &rtc);
+		strcat(fechaHora, "\r\n");
+		f_write( &fp, fechaHora, strlen(fechaHora), &nbytes );
+		// f_write( &fp, "Hola mundo\r\n", 12, &nbytes );
 
-    	  val = rtcRead( &rtc );
-    	  fechaHoraAString(&rtc, fechaHora, 32);
-    	  f_write( &fp, fechaHora, strlen(fechaHora), &nbytes );
-         f_write( &fp, "Hola mundo\r\n", 12, &nbytes );
 
-         f_close(&fp);
-
-         if( nbytes == 12 ){
+        if( nbytes == strlen(fechaHora) ){
             // Turn ON LEDG if the write operation was successful
             gpioWrite( LEDG, ON );
-         }
+        }
+        else
+        {
+            gpioWrite( LEDR, ON );
+
+        }
 	   }
+
+       f_close(&fp);
+
 
    }
    else {
 		// Turn ON LEDR if the write operation was fail
-		uartWriteString( UART_USB, "No escribir la memoria SD, esta conectada?\r\n" );
+		uartWriteString( UART_USB, "No se pudo acceder al archivo, esta conectada?\r\n" );
 		gpioWrite( LEDR, ON );
    }
 
